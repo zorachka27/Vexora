@@ -184,7 +184,7 @@ description: panelMessage,
             try {
                 const sentPanel = await panelChannel.send({
                     embeds: [setupEmbed],
-                    components: [ticketButton],
+                    components: [ticketMenu],
                 });
 
                 if (client.db && interaction.guildId) {
