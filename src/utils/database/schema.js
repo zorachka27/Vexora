@@ -173,6 +173,14 @@ export const tableStatements = [
         expires_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,
+    
+    `CREATE TABLE IF NOT EXISTS ${t.premium_servers} (
+    guild_id VARCHAR(20) PRIMARY KEY,
+    plan VARCHAR(50) DEFAULT 'premium',
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`,
 ];
 
 export const indexStatements = [
