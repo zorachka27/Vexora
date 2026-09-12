@@ -150,13 +150,36 @@ description: panelMessage,
                 color: getColor('info')
             });
 
-            const ticketButton = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setCustomId("create_ticket")
-.setLabel(buttonLabel)
-                    .setStyle(ButtonStyle.Primary)
-                    .setEmoji("📩"),
-            );
+            const ticketMenu = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+        .setCustomId('ticket_type')
+        .setPlaceholder('Select a ticket type...')
+        .addOptions(
+            new StringSelectMenuOptionBuilder()
+                .setLabel('General Support')
+                .setDescription('Get help with Vexora')
+                .setValue('general_support')
+                .setEmoji('🔷'),
+
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Role Request')
+                .setDescription('Request a server role')
+                .setValue('role_request')
+                .setEmoji('🏷️'),
+
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Report Ticket')
+                .setDescription('Report a member or issue')
+                .setValue('report')
+                .setEmoji('🚩'),
+
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Giveaway Claim')
+                .setDescription('Claim a giveaway prize')
+                .setValue('giveaway_claim')
+                .setEmoji('🎉'),
+        ),
+);
 
             try {
                 const sentPanel = await panelChannel.send({
