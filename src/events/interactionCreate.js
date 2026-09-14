@@ -359,7 +359,7 @@ export default {
               handler: 'general'
             }, interactionTraceContext));
           }
-        ```js
+       
 } else if (interaction.isStringSelectMenu()) {
   if (interaction.customId === 'ticket_type') {
     const ticketTypes = {
@@ -419,7 +419,6 @@ export default {
   }
   
   // Ticket type dropdown
-  if (interaction.customId === 'ticket_type') {
     const ticketType = interaction.values[0];
 
     try {
