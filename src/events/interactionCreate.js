@@ -360,6 +360,61 @@ export default {
             }, interactionTraceContext));
           }
         } else if (interaction.isStringSelectMenu()) {
+  // Ticket type dropdown
+  if (interaction.customId === 'ticket_type') {
+    const ticketType = interaction.values[0];
+
+    try {
+      const ticketHandler = client.selectMenus?.get('ticket_type');
+
+      if (ticketHandler) {
+        await ticketHandler.execute(interaction, client, [ticketType]);
+      } else {
+        await interaction.reply({
+          content: `You selected **${ticketType}**, but the ticket handler is not configured yet.`,
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+    } catch (error) {
+      await handleInteractionError(
+        interaction,
+        error,
+        withTraceContext({
+          type: 'select_menu',
+          customId: interaction.customId,
+          ticketType,
+        }, interactionTraceContext)
+      );
+    }
+
+    return;
+  }
+
+  // Other select menus
+  const [customId, ...args] = interaction.customId.split(':');
+  const selectMenu = client.selectMenus.get(customId);
+
+  if (!selectMenu) {
+    if (!interaction.customId.includes(':') || isCollectorManagedComponent(customId)) {
+      return;
+    }
+
+    throw createError(
+      `No select menu handler found for ${customId}`,
+      ErrorTypes.CONFIGURATION,
+      'This select menu is not available.',
+      withTraceContext({ customId }, interactionTraceContext)
+    );
+  }
+
+  try {
+    await selectMenu.execute(interaction, client, args);
+  } catch (error) {
+    await handleInteractionError(interaction, error, withTraceContext({
+      type: 'select_menu',
+      customId: interaction.customId
+    }, interactionTraceContext));
+  }
           const [customId, ...args] = interaction.customId.split(':');
           const selectMenu = client.selectMenus.get(customId);
 
