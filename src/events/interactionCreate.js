@@ -359,63 +359,65 @@ export default {
               handler: 'general'
             }, interactionTraceContext));
           }
-        } else if (interaction.isStringSelectMenu()) {
-          if (interaction.customId === 'ticket_type') {
-  const ticketTypes = {
-    general_support: 'General Support',
-    role_request: 'Role Request',
-    report: 'Report',
-    giveaway_claim: 'Giveaway Claim',
-  };
+        ```js
+} else if (interaction.isStringSelectMenu()) {
+  if (interaction.customId === 'ticket_type') {
+    const ticketTypes = {
+      general_support: 'General Support',
+      role_request: 'Role Request',
+      report: 'Report',
+      giveaway_claim: 'Giveaway Claim',
+    };
 
-  const selectedType = interaction.values[0];
-  const reason = ticketTypes[selectedType];
+    const selectedType = interaction.values[0];
+    const reason = ticketTypes[selectedType];
 
-  if (!reason) {
-    return interaction.reply({
-      content: '❌ Invalid ticket type selected.',
-      flags: MessageFlags.Ephemeral,
-    });
+    if (!reason) {
+      return interaction.reply({
+        content: '❌ Invalid ticket type selected.',
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    try {
+      const { getGuildConfig } = await import('../services/config/guildConfig.js');
+      const { createTicket } = await import('../services/ticket.js');
+
+      const guildConfig = await getGuildConfig(client, interaction.guildId);
+      const categoryId = guildConfig?.ticketCategoryId || null;
+
+      await interaction.deferReply({
+        flags: MessageFlags.Ephemeral,
+      });
+
+      const result = await createTicket(
+        interaction.guild,
+        interaction.member,
+        categoryId,
+        reason
+      );
+
+      await interaction.editReply({
+        content: `✅ Your **${reason}** ticket has been created: ${result.channel}`,
+      });
+    } catch (error) {
+      await handleInteractionError(
+        interaction,
+        error,
+        withTraceContext(
+          {
+            type: 'ticket_type',
+            customId: interaction.customId,
+            selectedType,
+          },
+          interactionTraceContext
+        )
+      );
+    }
+
+    return;
   }
-
-  try {
-    const { getGuildConfig } = await import('../services/config/guildConfig.js');
-    const { createTicket } = await import('../services/ticket.js');
-
-    const guildConfig = await getGuildConfig(client, interaction.guildId);
-    const categoryId = guildConfig?.ticketCategoryId || null;
-
-    await interaction.deferReply({
-      flags: MessageFlags.Ephemeral,
-    });
-
-    const result = await createTicket(
-      interaction.guild,
-      interaction.member,
-      categoryId,
-      reason
-    );
-
-    await interaction.editReply({
-      content: `✅ Your **${reason}** ticket has been created: ${result.channel}`,
-    });
-  } catch (error) {
-    await handleInteractionError(
-      interaction,
-      error,
-      withTraceContext(
-        {
-          type: 'ticket_type',
-          customId: interaction.customId,
-          selectedType,
-        },
-        interactionTraceContext
-      )
-    );
-  }
-
-  return;
-}
+  
   // Ticket type dropdown
   if (interaction.customId === 'ticket_type') {
     const ticketType = interaction.values[0];
